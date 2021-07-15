@@ -33,13 +33,10 @@ public class AutoPoster3 {
 			String b = cfgData[1].trim();
 			if(a.equals("access_token")) {
 				configInfo[0] = b;
-				System.out.println(b);
 			} else if (a.equals("app_secret")) {
 				configInfo[1] = b;
-				System.out.println(b);
 			} else if (a.equals("page_id")) {
 				configInfo[2] = b;
-				System.out.println(b);
 			} else {System.out.println("Error message");}  //Need a try/catch here
 		}
 		reader.close();
@@ -65,13 +62,14 @@ public class AutoPoster3 {
 		//call scheduler class, convertToJSON method to get schedule
 		Scheduler.convertToJSON();
 		
-		//
+		//call readConfigFile method passing the configFilePath which returns an array.
 		String[] config = readConfigFile(configFilePath);
 		
+		//create FacebookClient object for communicating with with Facebook Graph API
 		FacebookClient fbClient = new DefaultFacebookClient(config[0], config[1], Version.LATEST);
 		
 		//read csv file row by row storing data into variables
-		BufferedReader csvReader = new BufferedReader(new FileReader("C:\\Users\\j7b5w2\\eclipse-workspace\\ICS370_AutoPoster\\posting_schedule.csv"));
+		BufferedReader csvReader = new BufferedReader(new FileReader("posting_schedule.csv"));
 		String row;
 		String inId = "";
 		String inDate = "";
@@ -118,20 +116,19 @@ public class AutoPoster3 {
 				
   				    //Graph api to publish photo and message
 		            GraphResponse publishPhotoResponse = fbClient.publish(config[2]+"/photos", GraphResponse.class,
-				    BinaryAttachment.with("tree.jpg", array),
+				    BinaryAttachment.with("image.jpg", array),
 				    Parameter.with("message", msg));
 		
 		            //confirmation message of photo publishing
-		            System.out.println("Published photo ID: " + publishPhotoResponse.getId());
+		            System.out.println("Published post ID: " + publishPhotoResponse.getPostId());
 		            
 				}
 				//reset now time
 		        now = LocalDateTime.now();
-		        System.out.println(now);
 			}
 		}
 		csvReader.close();
-		System.out.println("Your messages have been scheduled to post on " + fbClient.fetchObject(config[2], User.class).getName());
+		System.out.println("All of your scheduled messages have been posted to " + fbClient.fetchObject(config[2], User.class).getName());
 	}
 	public static void main(String[] args) throws Exception {
 		
